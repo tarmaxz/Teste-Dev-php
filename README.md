@@ -1,4 +1,4 @@
-  # ** Teste para Desenvolvedor: API de Cadastro de Clientes com Validação de CEP **
+  # **Teste para Desenvolvedor: API de Cadastro de Clientes com Validação de CEP**
 
 O objetivo deste teste é desenvolver uma **API Rest** para o cadastro de clientes, garantindo que o cliente esteja em um CEP valido.
 
