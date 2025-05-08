@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-teste_dev_php}
+      MYSQL_USER: ${MYSQL_USER:-admin}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-admin}
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    ports:
+      - "3406:3306"
+    restart: unless-stopped
+    networks:
+      - mysql-network
+
+networks:
+  mysql-network:
+    driver: bridge
