@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Http;
 
 class BrasilApi {
 
-    public function getCepV2($cep = null) {
+    public static function getCepV2($cep = null) {
         $result = [];
         if (!empty($cep)) {
             $url = "https://brasilapi.com.br/api/cep/v2/{$cep}";
@@ -17,5 +17,4 @@ class BrasilApi {
         }
         return $result;
     }
-
 }

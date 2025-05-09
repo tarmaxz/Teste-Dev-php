@@ -20,12 +20,12 @@ class CreateCustomerTable extends Migration
             $table->string('email');
             $table->string('phone');
             $table->string('zip_code');
-            $table->string('address');
-            $table->string('street');
-            $table->string('number');
-            $table->string('neighborhood');
-            $table->string('city');
-            $table->string('state');
+            $table->string('address')->nullable();
+            $table->string('street')->nullable();
+            $table->string('number')->nullable();
+            $table->string('neighborhood')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

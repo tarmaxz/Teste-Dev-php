@@ -6,6 +6,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CustomerRequest extends FormRequest
 {
+    /**
+     * @return bool
+     */
     public function authorize()
     {
         return true;
@@ -19,10 +22,10 @@ class CustomerRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name_full' => 'required|string|max:255',
-            //'email' => ['required', 'email', 'max:80'],
-            //'cpf' => ['required', 'string', 'size:11'],
-            //'phone' => ['required', 'string', 'max:80']
+            'name_full' => 'required',
+            'cpf' => 'required|cpf',
+            'email' => 'required|email',
+            'zip_code' => 'required|numeric'
         ];
 
         return $rules;
@@ -37,11 +40,14 @@ class CustomerRequest extends FormRequest
     {
         return [
             'name_full.required' => 'O nome completo é obrigatório.',
-            /*'email.required' => 'O e-mail do responsável é obrigatório.',
-            'email.email' => 'O e-mail do responsável deve ser válido.',
-            'cpf.required' => 'O CPF do responsável é obrigatório.',
-            'cpf.size' => 'O CPF do responsável deve ter exatamente 11 dígitos.',
-            'phone.required' => 'O TELEFONE do responsável é obrigatório.',*/
+            'cpf.required' => 'O CPF é obrigatório.',
+            'cpf.cpf' => 'O CPF informado é inválido, Use o padrão 999.999.999-99',
+            'cpf.unique' => 'O CPF informado já está cadastrado.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'O e-mail informado não é válido.',
+            'email.unique' => 'O e-mail informado já está cadastrado.',
+            'zip_code.required' => 'O CEP é obrigatório.',
+            'zip_code.numeric' => 'O CEP deve conter apenas números.',
         ];
-    }
+    }    
 }

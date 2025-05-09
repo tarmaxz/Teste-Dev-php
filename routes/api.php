@@ -9,5 +9,5 @@ Route::prefix('customers')->group(function() {
     Route::get('/', [CustomerController::class, 'index']);
     Route::post('/', [CustomerController::class, 'store']);
     Route::delete('/{id}', [CustomerController::class, 'delete']);
-    Route::put('/{id}', [CustomerController::class, 'update']);
+    Route::put('/{id}', [CustomerController::class, 'update'])->name('customer.update');
 });

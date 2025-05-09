@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Builder;
+use App\Integrations\BrasilApi;
+use App\Exceptions\BusinessException;
 
 class CustomerRepository extends AbstractRepository {
 
@@ -13,6 +15,11 @@ class CustomerRepository extends AbstractRepository {
     {
         if ($query == null) {
             $filter = $this->model->query();
+
+            $query->orderBy('id', 'DESC');
+
+            $filter = $query;
+
         } else {
 
             if (!empty($params['filter_name_full'])) {
@@ -20,13 +27,25 @@ class CustomerRepository extends AbstractRepository {
                 $query->where('name_full', 'like', "%$name%");
             }
 
+            if (!empty($params['filter_cpf'])) {
+                $cpf = $params['filter_cpf'];
+                $query->where('cpf', $cpf);
+            }
+
+            if (!empty($params['filter_cpf'])) {
+                $cep = $params['filter_cpf'];
+                $query->where('cpf', $cep);
+            }
+
+            $query->orderBy('id', 'DESC');
+
             $filter = $query;
         }
 
         return $filter;
     }
 
-    public function list($params)
+    public function all($params)
     {
         $query = $this->model->query();
 
@@ -37,17 +56,72 @@ class CustomerRepository extends AbstractRepository {
 
     public function create(array $data)
     {
+        $responseCustomer = $this->model::where('email', $data['email'])->whereOr('cpf', $data['cpf'])->first();
+
+        if ($responseCustomer) {
+            throw new BusinessException('O cliente já está cadastrado');
+        }
+        
+        $response = BrasilApi::getCepV2($data['zip_code']);
+
+        if (!empty($response['cep'])) {
+            $data['zip_code'] = $response['cep'];
+        }
+
+        if (!empty($response['state'])) {
+            $data['state'] = $response['state'];
+        }
+
+        if (!empty($response['city'])) {
+            $data['city'] = $response['city'];
+        }
+
+        if (!empty($response['neighborhood'])) {
+            $data['neighborhood'] = $response['neighborhood'];
+        }
+
+        if (!empty($response['street'])) {
+            $data['street'] = $response['street'];
+        }
+
         return $this->model::create($data);
     }
 
     public function find($id)
     {
-        return $this->model::find($id);
+        $response = $this->model::find($id);
+        if (!$response) {
+            throw new BusinessException('Cliente não encontrado.');
+        }
+        return $response;
     }
 
-    public function update(array $data, $id)
+    public function update($id,array $data)
     {
         $response = $this->find($id);
+
+        if ($data['zip_code'] !== $response->zip_code) {
+            if (!empty($response['zip_code)'])) {
+                $data['zip_code'] = $response['cep'];
+            }
+    
+            if (!empty($response['state'])) {
+                $data['state'] = $response['state'];
+            }
+    
+            if (!empty($response['city'])) {
+                $data['city'] = $response['city'];
+            }
+    
+            if (!empty($response['neighborhood'])) {
+                $data['neighborhood'] = $response['neighborhood'];
+            }
+    
+            if (!empty($response['street'])) {
+                $data['street'] = $response['street'];
+            }
+        }
+
         $response->update($data);
 
         return $response;
@@ -59,4 +133,5 @@ class CustomerRepository extends AbstractRepository {
         $response->delete();
         return $response;
     }
+    
 }
