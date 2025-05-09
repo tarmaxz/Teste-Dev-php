@@ -28,7 +28,7 @@ class CustomerRepository extends AbstractRepository {
 
     public function list($params)
     {
-        $query = $this->model::all();
+        $query = $this->model->query();
 
         $filter = $this->filter($params, $query);
 

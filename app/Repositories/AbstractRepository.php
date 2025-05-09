@@ -5,6 +5,9 @@ namespace App\Repositories;
 use Illuminate\Database\Eloquent\Builder;
 
 abstract class AbstractRepository {
+    /**
+     * @var Model
+     */
     protected $model;
 
     public function __construct() {
