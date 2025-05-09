@@ -19,7 +19,7 @@ class CustomerRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name_full' => ['required'],
+            'name_full' => 'required|string|max:255',
             //'email' => ['required', 'email', 'max:80'],
             //'cpf' => ['required', 'string', 'size:11'],
             //'phone' => ['required', 'string', 'max:80']
