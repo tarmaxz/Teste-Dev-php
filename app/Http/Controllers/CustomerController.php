@@ -18,10 +18,10 @@ class CustomerController extends Controller {
         $this->customerRepository = $customerRepository;
     }
 
-    public function index(Request $request)
+    public function index()
     {
         try {
-            $response = $this->customerRepository->list($request->all());
+            $response = $this->customerRepository->list(request()->all());
             return response()->json($response);
         } catch (\Exception $e) {
             Log::error($e->getMessage());

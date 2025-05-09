@@ -3,17 +3,39 @@
 namespace App\Repositories;
 
 use App\Models\Customer;
+use Illuminate\Database\Eloquent\Builder;
 
 class CustomerRepository {
 
     protected $model = Customer::class;
 
-    public function list(array $data)
+    public function filter($params, $query = null): Builder
     {
-        return $this->model::all();
+        if ($query == null) {
+            $filter = $this->model->query();
+        } else {
+
+            if (!empty($params['filter_name_full'])) {
+                $name = $params['filter_name_full'];
+                $query->where('name_full', 'like', "%$name%");
+            }
+
+            $filter = $query;
+        }
+
+        return $filter;
     }
 
-    public function create(array $data) 
+    public function list($params)
+    {
+        $query = $this->model::all();
+
+        $filter = $this->filter($params, $query);
+
+        return $this->paginate($filter, $params);
+    }
+
+    public function create(array $data)
     {
         return $this->model::create($data);
     }
@@ -36,5 +58,17 @@ class CustomerRepository {
         $response = $this->find($id);
         $response->delete();
         return $response;
+    }
+
+    public function paginate(Builder $filter, $params)
+    {
+        $page = $params['page'] ?? 1;
+        $per_page = $params['per_page'] ?? 200;
+
+        if (!$filter) {
+            $filter = $this->model;
+        }
+
+        return $filter->paginate($per_page, ['*'], 'page', $page);
     }
 }
