@@ -3,24 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\Customers\CustomersRepository;
+use App\Repositories\CustomerRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use App\Http\Requests\CustomerRequest;
 
 class CustomerController extends Controller {
 
-    protected CustomersRepository $customersRepository;
+    protected CustomerRepository $customerRepository;
 
     public function __construct(
-        CustomersRepository $customersRepository,
+        CustomerRepository $customerRepository,
     ) {
-        $this->customersRepository = $customersRepository;
+        $this->customerRepository = $customerRepository;
     }
 
     public function index(Request $request)
     {
         try {
-            $response = $this->customersRepository->index($request->all());
+            $response = $this->customerRepository->list($request->all());
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return $this->responseError("Erro, não foi possível realizar a ação");
+        }
+    }
+
+    public function store(CustomerRequest $request)
+    {
+        try {
+            $response = $this->customerRepository->create($request->all());
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return $this->responseError("Erro, não foi possível realizar a ação");
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $response = $this->customerRepository->update($request->all(),$id);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return $this->responseError("Erro, não foi possível realizar a ação");
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $response = $this->customerRepository->delete($id);
             return response()->json($response);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
