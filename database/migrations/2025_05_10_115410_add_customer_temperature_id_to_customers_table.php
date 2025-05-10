@@ -14,7 +14,7 @@ class AddCustomerTemperatureIdToCustomersTable extends Migration
     public function up()
     {
         Schema::table('customers', function (Blueprint $table) {
-            $table->unsignedBigInteger('customer_temperature_id')->nullable()->after('state');
+            $table->unsignedBigInteger('customer_temperature_id')->nullable()->after('state')->default(1);
             $table->foreign('customer_temperature_id')->references('id')->on('customer_temperatures');
         });
     }

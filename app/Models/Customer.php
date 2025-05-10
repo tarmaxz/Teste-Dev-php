@@ -26,6 +26,6 @@ class Customer extends Model
 
     public function customer_temperature()
     {
-        return $this->belongsTo(CustomerTemperature::class);
+        return $this->belongsTo(CustomerTemperature::class)->select('id','name');
     }
 }

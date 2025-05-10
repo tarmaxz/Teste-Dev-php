@@ -6,6 +6,8 @@ use App\Models\Customer;
 use Illuminate\Database\Eloquent\Builder;
 use App\Integrations\BrasilApi;
 use App\Exceptions\BusinessException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CustomerRepository extends AbstractRepository {
 
@@ -15,8 +17,6 @@ class CustomerRepository extends AbstractRepository {
     {
         if ($query == null) {
             $filter = $this->model->query();
-
-            $query->orderBy('id', 'DESC');
 
             $filter = $query;
 
@@ -37,8 +37,6 @@ class CustomerRepository extends AbstractRepository {
                 $query->where('zip_code', $cep);
             }
 
-            $query->orderBy('id', 'DESC');
-
             $filter = $query;
         }
 
@@ -47,11 +45,23 @@ class CustomerRepository extends AbstractRepository {
 
     public function all($params)
     {
-        $query = $this->model->query();
+        $data = Cache::get('list_customer', null);
+        if (!empty($data)) {
+            Log::info('com cache');
+            return $data;
+        }
+
+        Log::info('sem cache');
+
+        $query = $this->model::with(['customer_temperature'])->orderBy('id', 'DESC');
 
         $filter = $this->filter($params, $query);
 
-        return $this->paginate($filter, $params);
+        $paginateData = $this->paginate($filter, $params);
+
+        Cache::put('list_customer', $paginateData, now()->addMinute(10));
+
+        return $paginateData;
     }
 
     public function create(array $data)
@@ -90,6 +100,7 @@ class CustomerRepository extends AbstractRepository {
     public function find($id)
     {
         $response = $this->model::find($id);
+
         if (!$response) {
             throw new BusinessException('Cliente não encontrado.');
         }
@@ -126,6 +137,7 @@ class CustomerRepository extends AbstractRepository {
         }
 
         $responseData->update($data);
+        $responseData->load(['customer_temperature']);
 
         return $responseData;
     }
