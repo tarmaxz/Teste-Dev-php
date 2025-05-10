@@ -32,9 +32,9 @@ class CustomerRepository extends AbstractRepository {
                 $query->where('cpf', $cpf);
             }
 
-            if (!empty($params['filter_cpf'])) {
-                $cep = $params['filter_cpf'];
-                $query->where('cpf', $cep);
+            if (!empty($params['filter_cep'])) {
+                $cep = $params['filter_cep'];
+                $query->where('zip_code', $cep);
             }
 
             $query->orderBy('id', 'DESC');
@@ -98,9 +98,12 @@ class CustomerRepository extends AbstractRepository {
 
     public function update($id,array $data)
     {
-        $response = $this->find($id);
+        $responseData = $this->find($id);
 
-        if ($data['zip_code'] !== $response->zip_code) {
+        if ($data['zip_code'] !== $responseData->zip_code) {
+
+            $response = BrasilApi::getCepV2($data['zip_code']);
+
             if (!empty($response['zip_code)'])) {
                 $data['zip_code'] = $response['cep'];
             }
@@ -122,9 +125,9 @@ class CustomerRepository extends AbstractRepository {
             }
         }
 
-        $response->update($data);
+        $responseData->update($data);
 
-        return $response;
+        return $responseData;
     }
 
     public function delete($id)
