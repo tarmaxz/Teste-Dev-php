@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\CustomerTemperature;
 
 class Customer extends Model
 {
@@ -19,6 +20,12 @@ class Customer extends Model
         'neighborhood',
         'number',
         'city',
-        'state'
+        'state',
+        'customer_temperature_id',
     ];
+
+    public function customer_temperature()
+    {
+        return $this->belongsTo(CustomerTemperature::class);
+    }
 }
