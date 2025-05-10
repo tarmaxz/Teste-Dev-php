@@ -31,6 +31,17 @@ class CustomerController extends Controller {
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $response = $this->customerRepository->find($id);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return $this->responseError("Erro, não foi possível realizar a ação");
+        }
+    }
+
     public function store(CustomerRequest $request)
     {
         DB::beginTransaction();
