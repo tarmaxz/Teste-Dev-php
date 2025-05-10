@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Customer;
+use App\Repositories\CustomerTemperatureRepository;
 use Illuminate\Database\Eloquent\Builder;
 use App\Integrations\BrasilApi;
 use App\Exceptions\BusinessException;
@@ -12,6 +13,13 @@ use Illuminate\Support\Facades\Log;
 class CustomerRepository extends AbstractRepository {
 
     protected $model = Customer::class;
+    protected $customerTemperatureRepository = CustomerTemperatureRepository::class;
+
+    public function __construct(CustomerTemperatureRepository $customerTemperatureRepository)
+    {
+        $this->customerTemperatureRepository = $customerTemperatureRepository;
+        parent::__construct();
+    }
 
     public function filter($params, $query = null): Builder
     {
@@ -68,6 +76,8 @@ class CustomerRepository extends AbstractRepository {
     {
         $responseCustomer = $this->model::where('email', $data['email'])->whereOr('cpf', $data['cpf'])->first();
 
+        $this->customerTemperatureRepository->validatorCustomerTemperature($data['customer_temperature_id'] ?? null);
+
         if ($responseCustomer) {
             throw new BusinessException('O cliente já está cadastrado');
         }
@@ -111,6 +121,8 @@ class CustomerRepository extends AbstractRepository {
     {
         $responseData = $this->find($id);
 
+        $this->customerTemperatureRepository->validatorCustomerTemperature($data['customer_temperature_id'] ?? null);
+
         if ($data['zip_code'] !== $responseData->zip_code) {
 
             $response = BrasilApi::getCepV2($data['zip_code']);
@@ -148,5 +160,4 @@ class CustomerRepository extends AbstractRepository {
         $response->delete();
         return $response;
     }
-    
 }

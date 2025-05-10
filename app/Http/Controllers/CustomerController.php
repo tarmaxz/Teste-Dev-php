@@ -53,9 +53,10 @@ class CustomerController extends Controller {
             $response = $this->customerRepository->update($id, $request->all());
             DB::commit();
             return response()->json($response);
+        } catch (BusinessException $e) {
+            return $this->responseError($e->getMessage());
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage(), [$e]);
+            Log::error($e->getMessage());
             return $this->responseError("Erro, não foi possível realizar a ação");
         }
     }

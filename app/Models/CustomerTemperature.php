@@ -8,6 +8,7 @@ use App\Models\Customer;
 class CustomerTemperature extends Model
 {
     protected $fillable = [
+        'id',
         'name',
     ];
 
